@@ -1,0 +1,47 @@
+{
+  "project_info": {
+    "project_number": "643460340403",
+    "project_id": "we-chat-18f77",
+    "storage_bucket": "we-chat-18f77.appspot.com"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:643460340403:android:1958ce0104563485f56ec6",
+        "android_client_info": {
+          "package_name": "com.example.we_chat"
+        }
+      },
+      "oauth_client": [
+        {
+          "client_id": "643460340403-vv3ksqmehaqht59dvhnm77rl0670q14u.apps.googleusercontent.com",
+          "client_type": 1,
+          "android_info": {
+            "package_name": "com.example.we_chat",
+            "certificate_hash": "03dc97c8d67ce5d37bdade395c287fb2a2208bf9"
+          }
+        },
+        {
+          "client_id": "643460340403-2omqct71e4ro0j6ccorhl31c0rfiiujh.apps.googleusercontent.com",
+          "client_type": 3
+        }
+      ],
+      "api_key": [
+        {
+          "current_key": "AIzaSyBR5wRuWDGAAwHMa4qsNyJ023FnEMl0Zto"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": [
+            {
+              "client_id": "643460340403-2omqct71e4ro0j6ccorhl31c0rfiiujh.apps.googleusercontent.com",
+              "client_type": 3
+            }
+          ]
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}
