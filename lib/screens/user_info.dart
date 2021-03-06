@@ -1,20 +1,12 @@
-import 'package:cloud_firestore/cloud_firestore.dart';
-import 'package:firebase_auth/firebase_auth.dart';
-import 'package:firebase_storage/firebase_storage.dart' as firebase_storage;
 import 'dart:io';
+import 'package:fluttertoast/fluttertoast.dart';
 import 'package:flutter/material.dart';
-import 'package:image_picker/image_picker.dart';
-import 'package:we_chat/components/loading.dart';
-import 'package:we_chat/components/rounded_button.dart';
-import '../constants.dart';
-
-firebase_storage.FirebaseStorage storage =
-    firebase_storage.FirebaseStorage.instance;
-User user = FirebaseAuth.instance.currentUser;
-final _firestore = FirebaseFirestore.instance;
+import 'package:we_chat/Widgets/loading.dart';
+import 'package:we_chat/Widgets/rounded_button.dart';
+import 'package:we_chat/utils/getImage.dart';
+import 'package:we_chat/utils/userUpdate.dart';
 
 class UserInfoDetaols extends StatefulWidget {
-  static const String id = 'user_info';
   final String nickname;
   final String photoUrl;
   UserInfoDetaols({Key key, @required this.nickname, @required this.photoUrl})
@@ -29,9 +21,8 @@ class _UserInfoDetaolsState extends State<UserInfoDetaols> {
   String nickname;
   String photoUrl;
   bool showSpinner = false;
+  var error;
   File _image;
-  String email = user.email;
-  final picker = ImagePicker();
   var profile;
   TextEditingController _controller;
 
@@ -39,17 +30,6 @@ class _UserInfoDetaolsState extends State<UserInfoDetaols> {
   void initState() {
     super.initState();
     _controller = new TextEditingController(text: nickname);
-  }
-
-  Future getImage() async {
-    final pickedFile = await picker.getImage(
-        source: ImageSource.gallery, maxHeight: 500, maxWidth: 500);
-    setState(() {
-      if (pickedFile != null) {
-        _image = File(pickedFile.path);
-        profile = FileImage(_image);
-      }
-    });
   }
 
   @override
@@ -89,7 +69,14 @@ class _UserInfoDetaolsState extends State<UserInfoDetaols> {
                 height: 5.0,
               ),
               FloatingActionButton(
-                onPressed: getImage,
+                onPressed: () async {
+                  _image = await getImage();
+                  setState(() {
+                    if (_image != null) {
+                      profile = FileImage(_image);
+                    }
+                  });
+                },
                 tooltip: 'Pick Image',
                 child: Icon(Icons.add_a_photo),
               ),
@@ -103,49 +90,34 @@ class _UserInfoDetaolsState extends State<UserInfoDetaols> {
                 onChanged: (value) {
                   nickname = value;
                 },
-                decoration: kTextFieldDecoration.copyWith(hintText: ""),
+                decoration: InputDecoration(
+                  contentPadding:
+                      EdgeInsets.symmetric(vertical: 10.0, horizontal: 20.0),
+                  border: OutlineInputBorder(
+                    borderRadius: BorderRadius.all(Radius.circular(32.0)),
+                  ),
+                ),
               ),
               RoundedButton(
                 title: 'Update',
                 colour: Colors.blueAccent,
                 onPressed: () async {
-                  if (nickname != null) {
+                  if (nickname.trim() != null && _image != null) {
                     setState(() {
                       showSpinner = true;
                     });
-                    try {
-                      if (_image != null) {
-                        try {
-                          await storage
-                              .ref('profileImage/$email')
-                              .putFile(_image);
-                        } catch (e) {
-                          // e.g, e.code == 'canceled'
-                        }
-                        try {
-                          photoUrl = await firebase_storage
-                              .FirebaseStorage.instance
-                              .ref('profileImage/$email')
-                              .getDownloadURL();
-                        } catch (e) {
-                          // e.g, e.code == 'canceled'
-                        }
-                      }
-
-                      _firestore
-                          .collection('users')
-                          .doc(user.uid)
-                          .update({'nickname': nickname, 'photoUrl': photoUrl});
+                    error = updateUser(_image, nickname, photoUrl);
+                    if (error) {
+                      Fluttertoast.showToast(
+                          msg: error.code.toString(),
+                          backgroundColor: Colors.black45,
+                          textColor: Colors.red);
+                    } else {
                       Navigator.pop(context);
-                      setState(() {
-                        showSpinner = false;
-                      });
-                    } catch (e) {
-                      print(e);
-                      setState(() {
-                        showSpinner = false;
-                      });
                     }
+                    setState(() {
+                      showSpinner = false;
+                    });
                   }
                 },
               ),

@@ -1,11 +1,9 @@
-import 'dart:async';
 import 'dart:convert';
 import 'dart:io';
 import 'package:flutter/foundation.dart';
-import 'dart:developer';
 import 'package:we_chat/Widgets/Chat_tile.dart';
 import 'package:we_chat/Widgets/Exit_popup.dart';
-import 'package:we_chat/components/loading.dart';
+import 'package:we_chat/Widgets/loading.dart';
 import 'package:we_chat/screens/login_screen.dart';
 import 'package:we_chat/screens/user_info.dart';
 import 'package:flutter/material.dart';
@@ -17,7 +15,6 @@ import 'package:firebase_messaging/firebase_messaging.dart';
 import 'package:fluttertoast/fluttertoast.dart';
 import 'package:google_sign_in/google_sign_in.dart';
 import 'package:we_chat/utils/googleSignIn.dart';
-import 'chat_screen.dart';
 
 class HomeScreen extends StatefulWidget {
   final String currentUserId;

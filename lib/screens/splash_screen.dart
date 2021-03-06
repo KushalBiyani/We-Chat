@@ -1,4 +1,3 @@
-import 'package:we_chat/screens/chat_screen.dart';
 import 'package:we_chat/screens/login_screen.dart';
 import 'package:flutter/material.dart';
 import 'package:splashscreen/splashscreen.dart';

@@ -79,14 +79,6 @@ Widget buildItem(
                       alignment: Alignment.centerLeft,
                       margin: EdgeInsets.fromLTRB(10.0, 0.0, 0.0, 5.0),
                     ),
-                    // Container(
-                    //   child: Text(
-                    //     'About me: ${document.data()['aboutMe'] ?? 'Not available'}',
-                    //     style: TextStyle(color: Colors.blue),
-                    //   ),
-                    //   alignment: Alignment.centerLeft,
-                    //   margin: EdgeInsets.fromLTRB(10.0, 0.0, 0.0, 0.0),
-                    // )
                   ],
                 ),
                 margin: EdgeInsets.only(left: 10.0),
@@ -100,6 +92,7 @@ Widget buildItem(
               MaterialPageRoute(
                   builder: (context) => Chat(
                         peerId: document.id,
+                        peerName: document.data()['nickname'],
                         peerAvatar: document.data()['photoUrl'],
                       )));
         },

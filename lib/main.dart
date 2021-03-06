@@ -1,6 +1,5 @@
 import 'package:flutter/material.dart';
 import 'package:we_chat/screens/login_screen.dart';
-import 'package:we_chat/screens/chat_screen.dart';
 import 'package:firebase_core/firebase_core.dart';
 import 'package:we_chat/screens/splash_screen.dart';
 
@@ -23,7 +22,6 @@ class _FlashChatState extends State<FlashChat> {
       routes: {
         MyApp.id: (context) => MyApp(),
         LoginScreen.id: (context) => LoginScreen(),
-        ChatScreen.id: (context) => ChatScreen(),
       },
       debugShowCheckedModeBanner: false,
     );
