@@ -1,9 +1,12 @@
 import 'dart:async';
+import 'package:cached_network_image/cached_network_image.dart';
+import 'package:emoji_picker/emoji_picker.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 import 'package:fluttertoast/fluttertoast.dart';
 import 'package:we_chat/Widgets/inputIcon.dart';
 import 'package:we_chat/Widgets/loading.dart';
+import 'package:we_chat/screens/imageView.dart';
 import 'package:we_chat/utils/MessageStreamBuilder.dart';
 import 'package:we_chat/utils/firebaseUserHelper.dart';
 import 'package:we_chat/utils/sendMessage.dart';
@@ -24,11 +27,21 @@ class Chat extends StatelessWidget {
       appBar: AppBar(
         title: Row(
           children: [
-            CircleAvatar(
-              radius: 20,
-              backgroundImage: peerAvatar != null
-                  ? NetworkImage(peerAvatar)
-                  : AssetImage('images/nullprofile.jpg'),
+            GestureDetector(
+              onTap: () {
+                Navigator.push(context, MaterialPageRoute(builder: (_) {
+                  return DetailScreen(peerAvatar, peerId);
+                }));
+              },
+              child: Hero(
+                tag: peerId,
+                child: CircleAvatar(
+                  radius: 20,
+                  backgroundImage: peerAvatar != null
+                      ? CachedNetworkImageProvider(peerAvatar)
+                      : AssetImage('images/nullprofile.jpg'),
+                ),
+              ),
             ),
             SizedBox(
               width: 15,
@@ -185,13 +198,24 @@ class ChatScreenState extends State<ChatScreen> {
                 listMessage: listMessage,
                 listScrollController: listScrollController,
               ),
+
               InputWidget(
                 imageFunction: uploadFile,
                 stickerFunction: getSticker,
                 sendFunction: sendText,
                 textController: textEditingController,
                 keyboardFocus: focusNode,
-              )
+              ),
+              isShowSticker
+                  ? EmojiPicker(
+                      rows: 4,
+                      columns: 9,
+                      numRecommended: 10,
+                      onEmojiSelected: (emoji, category) {
+                        textEditingController.text += emoji.emoji;
+                      },
+                    )
+                  : Container(),
             ]),
           ),
           // Loading

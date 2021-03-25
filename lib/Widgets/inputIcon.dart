@@ -27,7 +27,7 @@ class InputWidget extends StatelessWidget {
             onPressed: imageFunction,
           ),
           InputIcon(
-            icon: Icons.face,
+            icon: Icons.emoji_emotions_outlined,
             onPressed: stickerFunction,
           ),
           // Edit text

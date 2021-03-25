@@ -1,6 +1,8 @@
+import 'package:cached_network_image/cached_network_image.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/material.dart';
 import 'package:we_chat/screens/chat.dart';
+import 'package:we_chat/screens/imageView.dart';
 
 class UserListBuilder extends StatelessWidget {
   const UserListBuilder({
@@ -56,9 +58,21 @@ Widget buildItem(
         child: Row(
           children: <Widget>[
             document.data()['photoUrl'] != null
-                ? CircleAvatar(
-                    radius: 30,
-                    backgroundImage: NetworkImage(document.data()['photoUrl']),
+                ? GestureDetector(
+                    child: Hero(
+                      tag: document.data()['nickname'],
+                      child: CircleAvatar(
+                        radius: 30,
+                        backgroundImage: CachedNetworkImageProvider(
+                            document.data()['photoUrl']),
+                      ),
+                    ),
+                    onTap: () {
+                      Navigator.push(context, MaterialPageRoute(builder: (_) {
+                        return DetailScreen(document.data()['photoUrl'],
+                            document.data()['nickname']);
+                      }));
+                    },
                   )
                 : Container(
                     child: Icon(

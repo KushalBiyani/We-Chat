@@ -1,5 +1,7 @@
+import 'package:cached_network_image/cached_network_image.dart';
 import 'package:flutter/material.dart';
 import 'package:intl/intl.dart';
+import 'package:we_chat/screens/imageView.dart';
 
 class MessageBubble extends StatelessWidget {
   final Map data;
@@ -23,32 +25,28 @@ class MessageBubble extends StatelessWidget {
           children: <Widget>[
             // Text
             data['type'] == 1
-                ? Container(
-                    decoration: BoxDecoration(
-                      color: itsMe ? Colors.lightBlueAccent : Colors.white,
-                      borderRadius: border,
-                    ),
-                    height: 250,
-                    width: 250,
-                    child: Padding(
-                      padding: EdgeInsets.all(8.0),
-                      child: GestureDetector(
-                        child: Hero(
-                          tag: data['timestamp'],
-                          child: Image.network(
-                            data['content'],
-                            height: 195,
-                            width: 195,
-                            fit: BoxFit.fill,
-                          ),
+                ? ClipRRect(
+                    borderRadius: BorderRadius.circular(12.0),
+                    child: GestureDetector(
+                      child: Hero(
+                        tag: data['timestamp'],
+                        child: CachedNetworkImage(
+                          imageUrl: data['content'].toString(),
+                          placeholder: (context, url) =>
+                              CircularProgressIndicator(),
+                          errorWidget: (context, url, error) =>
+                              Icon(Icons.error),
+                          fit: BoxFit.fill,
+                          height: 250,
+                          width: 250,
                         ),
-                        onTap: () {
-                          Navigator.push(context,
-                              MaterialPageRoute(builder: (_) {
-                            return DetailScreen(data);
-                          }));
-                        },
                       ),
+                      onTap: () {
+                        Navigator.push(context, MaterialPageRoute(builder: (_) {
+                          return DetailScreen(
+                              data['content'], data['timestamp']);
+                        }));
+                      },
                     ),
                   )
                 : Container(
@@ -83,28 +81,6 @@ class MessageBubble extends StatelessWidget {
       margin: itsMe
           ? EdgeInsets.only(bottom: 5.0, right: 10.0)
           : EdgeInsets.only(bottom: 5.0, left: 10),
-    );
-  }
-}
-
-class DetailScreen extends StatelessWidget {
-  final Map data;
-  DetailScreen(this.data);
-  @override
-  Widget build(BuildContext context) {
-    return Scaffold(
-      appBar: AppBar(),
-      body: GestureDetector(
-        child: Center(
-          child: Hero(
-            tag: data['timestamp'],
-            child: Image.network(data['content']),
-          ),
-        ),
-        onTap: () {
-          Navigator.pop(context);
-        },
-      ),
     );
   }
 }

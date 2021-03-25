@@ -36,7 +36,6 @@ class _LoginScreenState extends State<LoginScreen> {
                     HomeScreen(currentUserId: firebaseUser.uid)));
       }
     } catch (e) {
-      print(e);
       Fluttertoast.showToast(msg: e.toString());
       this.setState(() {
         isLoading = false;
