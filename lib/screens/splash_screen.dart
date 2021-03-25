@@ -29,7 +29,7 @@ class _MyAppState extends State<MyApp> {
         seconds: 2,
         navigateAfterSeconds: navigate,
         title: Text(
-          'Flash Chat',
+          'We Chat',
           style: TextStyle(fontWeight: FontWeight.bold, fontSize: 20.0),
         ),
         image: Image.asset('images/logo.png'),

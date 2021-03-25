@@ -3,8 +3,7 @@ import 'package:fluttertoast/fluttertoast.dart';
 import 'package:flutter/material.dart';
 import 'package:we_chat/Widgets/loading.dart';
 import 'package:we_chat/Widgets/rounded_button.dart';
-import 'package:we_chat/utils/getImage.dart';
-import 'package:we_chat/utils/userUpdate.dart';
+import 'package:we_chat/utils/firebaseUserHelper.dart';
 
 class UserInfoDetaols extends StatefulWidget {
   final String nickname;

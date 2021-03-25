@@ -1,14 +1,11 @@
 import 'dart:async';
-import 'dart:io';
-import 'package:cloud_firestore/cloud_firestore.dart';
-import 'package:firebase_storage/firebase_storage.dart' as firebase_storage;
+import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 import 'package:fluttertoast/fluttertoast.dart';
-import 'package:shared_preferences/shared_preferences.dart';
 import 'package:we_chat/Widgets/inputIcon.dart';
 import 'package:we_chat/Widgets/loading.dart';
 import 'package:we_chat/utils/MessageStreamBuilder.dart';
-import 'package:we_chat/utils/getImage.dart';
+import 'package:we_chat/utils/firebaseUserHelper.dart';
 import 'package:we_chat/utils/sendMessage.dart';
 
 class Chat extends StatelessWidget {
@@ -68,14 +65,11 @@ class ChatScreenState extends State<ChatScreen> {
   ChatScreenState({Key key, @required this.peerId, @required this.peerAvatar});
   String peerId;
   String peerAvatar;
-  String id;
-  List<QueryDocumentSnapshot> listMessage = new List.from([]);
+  final String id = FirebaseAuth.instance.currentUser.uid;
+  List listMessage = new List.from([]);
   int _limit = 20;
-  int _limitIncrement = 20;
   String groupChatId;
-  SharedPreferences prefs;
   dynamic message;
-  File imageFile;
   bool isLoading;
   bool isShowSticker;
   String imageUrl;
@@ -89,7 +83,7 @@ class ChatScreenState extends State<ChatScreen> {
             listScrollController.position.maxScrollExtent &&
         !listScrollController.position.outOfRange) {
       setState(() {
-        _limit += _limitIncrement;
+        _limit += 20;
       });
     }
   }
@@ -99,11 +93,11 @@ class ChatScreenState extends State<ChatScreen> {
     super.initState();
     focusNode.addListener(onFocusChange);
     listScrollController.addListener(_scrollListener);
-    groupChatId = '';
+    groupChatId =
+        id.hashCode <= peerId.hashCode ? '$id-$peerId' : '$peerId-$id';
     isLoading = false;
     isShowSticker = false;
     imageUrl = '';
-    readLocal();
   }
 
   void onFocusChange() {
@@ -125,23 +119,6 @@ class ChatScreenState extends State<ChatScreen> {
     };
   }
 
-  readLocal() async {
-    prefs = await SharedPreferences.getInstance();
-    id = prefs.getString('id') ?? '';
-    if (id.hashCode <= peerId.hashCode) {
-      groupChatId = '$id-$peerId';
-    } else {
-      groupChatId = '$peerId-$id';
-    }
-
-    FirebaseFirestore.instance
-        .collection('users')
-        .doc(id)
-        .update({'chattingWith': peerId});
-
-    setState(() {});
-  }
-
   void getSticker() {
     // Hide keyboard when sticker appear
     focusNode.unfocus();
@@ -151,32 +128,21 @@ class ChatScreenState extends State<ChatScreen> {
   }
 
   Future uploadFile() async {
-    imageFile = await getImage();
-    if (imageFile != null) {
+    setState(() {
+      isLoading = true;
+    });
+    imageUrl = await uploadImage(groupChatId);
+    if (imageUrl != null) {
       setState(() {
-        isLoading = true;
+        isLoading = false;
+        setMessage(imageUrl, 1);
+        sendMessage(groupChatId, message);
       });
-      String fileName =
-          groupChatId + DateTime.now().millisecondsSinceEpoch.toString();
-
-      try {
-        await firebase_storage.FirebaseStorage.instance
-            .ref('chatImages/$fileName')
-            .putFile(imageFile);
-        imageUrl = await firebase_storage.FirebaseStorage.instance
-            .ref('chatImages/$fileName')
-            .getDownloadURL();
-        setState(() {
-          isLoading = false;
-          setMessage(imageUrl, 1);
-          sendMessage(groupChatId, message);
-        });
-      } catch (err) {
-        setState(() {
-          isLoading = false;
-        });
-        Fluttertoast.showToast(msg: err.toString());
-      }
+    } else {
+      setState(() {
+        isLoading = false;
+      });
+      Fluttertoast.showToast(msg: 'Please Select an Image');
     }
   }
 
@@ -188,10 +154,7 @@ class ChatScreenState extends State<ChatScreen> {
       listScrollController.animateTo(0.0,
           duration: Duration(milliseconds: 300), curve: Curves.easeOut);
     } else {
-      Fluttertoast.showToast(
-          msg: 'Nothing to send',
-          backgroundColor: Colors.white,
-          textColor: Colors.red);
+      Fluttertoast.showToast(msg: 'Nothing to send');
     }
   }
 
